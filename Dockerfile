@@ -1,9 +1,6 @@
 # docker build --rm=true -t genshen/mpich:3.2.1 .
 FROM alpine:latest AS mpich_builder
 
-LABEL maintainer="genshen genshenchu@gmail.com" \
-      description="MPI development environment,including mpich,gcc,g++,gfortran,make."
-
 ARG REQUIRE="build-base gfortran"
 #  apk update && apk upgrade
 RUN apk add --no-cache ${REQUIRE}
@@ -31,6 +28,9 @@ RUN wget http://www.mpich.org/static/downloads/${MPICH_VERSION}/mpich-${MPICH_VE
 
 
 FROM alpine:latest
+
+LABEL maintainer="genshen genshenchu@gmail.com" \
+      description="MPI development environment,including mpich,gcc,g++,gfortran,make."
 
 #### ADD DEFAULT USER ####
 ARG USER=mpi
