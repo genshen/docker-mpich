@@ -34,12 +34,16 @@ LABEL maintainer="genshen genshenchu@gmail.com" \
 
 #### ADD DEFAULT USER ####
 ARG USER=mpi
-ENV USER_HOME="/home/${USER}"  WORKDIR="/project"
+ENV USER_HOME="/home/${USER}"  WORKDIR="/project"  MPI_HOME=/usr/local/mpi-3.2.1
 
-COPY --from=mpich_builder /usr/local/mpi-3.2.1   /usr/
+COPY --from=mpich_builder /usr/local/mpi-3.2.1  /usr/local/mpi-3.2.1
 
 # build-base including gcc g++ make libc-dev binutils fortift-headers.
 RUN apk add --no-cache build-base sudo gfortran \
+    && mkdir -p /usr/local/include  /usr/local/bin  /usr/local/lib  \
+    && cd /usr/local/bin && ln -s ${MPI_HOME}/bin/* ./    \
+    && cd /usr/local/include && ln -s ${MPI_HOME}/include/* ./   \
+    && cd /usr/local/lib && ln -s ${MPI_HOME}/lib/* ./  \
     && adduser -D ${USER} \
     && echo "${USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
     && chown -R ${USER}:${USER} ${USER_HOME} \
