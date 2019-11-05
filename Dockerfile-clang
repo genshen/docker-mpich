@@ -1,9 +1,8 @@
-# docker build --rm=true -t genshen/mpich:3.3.1 .
-FROM alpine:latest AS mpich_builder
+# This is mpich Dockerfile for clang/clang++ compiler (no fortran compiler).
+# docker build --rm=true -t genshen/mpich:3.3.1-clang .
+FROM genshen/clang-toolchain:latest AS mpich_builder
 
-ARG REQUIRE="build-base gfortran linux-headers"
-#  apk update && apk upgrade
-RUN apk add --no-cache ${REQUIRE}
+RUN apk add --no-cache make linux-headers
 
 #### INSTALL MPICH ####
 # Source is available at http://www.mpich.org/static/downloads/
@@ -14,7 +13,7 @@ RUN apk add --no-cache ${REQUIRE}
 # These options are passed to the steps below
 ARG MPICH_SRC_DIR="/tmp/mpich-3.3.1"
 ARG MPICH_VERSION="3.3.1"
-ARG MPICH_CONFIGURE_OPTIONS="--prefix=/usr/local/mpi-3.3.1"
+ARG MPICH_CONFIGURE_OPTIONS="--prefix=/usr/local/mpi-3.3.1 --disable-fortran"
 ARG MPICH_MAKE_OPTIONS=""
 
 # Download, build, and install MPICH
@@ -27,10 +26,10 @@ RUN wget http://www.mpich.org/static/downloads/${MPICH_VERSION}/mpich-${MPICH_VE
     && rm -rf ${MPICH_SRC_DIR}
 
 
-FROM alpine:latest
+FROM genshen/clang-toolchain:latest
 
 LABEL maintainer="genshen genshenchu@gmail.com" \
-      description="MPI development environment,including mpich,gcc,g++,gfortran,make."
+      description="MPI development environment based on clang, including clang,clang++,mpich,make."
 
 #### ADD DEFAULT USER ####
 ARG USER=mpi
@@ -38,8 +37,7 @@ ENV USER_HOME="/home/${USER}"  WORKDIR="/project"  MPI_HOME=/usr/local/mpi-3.3.1
 
 COPY --from=mpich_builder /usr/local/mpi-3.3.1  /usr/local/mpi-3.3.1
 
-# build-base including gcc g++ make libc-dev binutils fortift-headers.
-RUN apk add --no-cache build-base sudo gfortran \
+RUN apk add --no-cache make sudo \
     && mkdir -p /usr/local/include  /usr/local/bin  /usr/local/lib  \
     && cd /usr/local/bin && ln -s ${MPI_HOME}/bin/* ./    \
     && cd /usr/local/include && ln -s ${MPI_HOME}/include/* ./   \
@@ -47,10 +45,8 @@ RUN apk add --no-cache build-base sudo gfortran \
     && adduser -D ${USER} \
     && echo "${USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
     && chown -R ${USER}:${USER} ${USER_HOME} \
-    && mkdir ${WORKDIR} \
+    && mkdir -p ${WORKDIR} \
     && chown -R ${USER}:${USER} ${WORKDIR}
 
 WORKDIR ${WORKDIR}
 USER ${USER}
-
-# CMD ["/bin/ash"]  # default is /bin/sh
