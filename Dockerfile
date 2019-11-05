@@ -1,7 +1,7 @@
-# docker build --rm=true -t genshen/mpich:3.2.1 .
+# docker build --rm=true -t genshen/mpich:3.3.1 .
 FROM alpine:latest AS mpich_builder
 
-ARG REQUIRE="build-base gfortran"
+ARG REQUIRE="build-base gfortran linux-headers"
 #  apk update && apk upgrade
 RUN apk add --no-cache ${REQUIRE}
 
@@ -10,11 +10,11 @@ RUN apk add --no-cache ${REQUIRE}
 
 # Build Options:
 # See installation guide of target MPICH version
-# Ex: http://www.mpich.org/static/downloads/3.2.1/mpich-3.2.1-installguide.pdf
+# Ex: http://www.mpich.org/static/downloads/3.3.1/mpich-3.3.1-installguide.pdf
 # These options are passed to the steps below
-ARG MPICH_SRC_DIR="/tmp/mpich-3.2.1"
-ARG MPICH_VERSION="3.2.1"
-ARG MPICH_CONFIGURE_OPTIONS="--prefix=/usr/local/mpi-3.2.1"
+ARG MPICH_SRC_DIR="/tmp/mpich-3.3.1"
+ARG MPICH_VERSION="3.3.1"
+ARG MPICH_CONFIGURE_OPTIONS="--prefix=/usr/local/mpi-3.3.1"
 ARG MPICH_MAKE_OPTIONS="-j4"
 
 # Download, build, and install MPICH
@@ -34,9 +34,9 @@ LABEL maintainer="genshen genshenchu@gmail.com" \
 
 #### ADD DEFAULT USER ####
 ARG USER=mpi
-ENV USER_HOME="/home/${USER}"  WORKDIR="/project"  MPI_HOME=/usr/local/mpi-3.2.1
+ENV USER_HOME="/home/${USER}"  WORKDIR="/project"  MPI_HOME=/usr/local/mpi-3.3.1
 
-COPY --from=mpich_builder /usr/local/mpi-3.2.1  /usr/local/mpi-3.2.1
+COPY --from=mpich_builder /usr/local/mpi-3.3.1  /usr/local/mpi-3.3.1
 
 # build-base including gcc g++ make libc-dev binutils fortift-headers.
 RUN apk add --no-cache build-base sudo gfortran \
