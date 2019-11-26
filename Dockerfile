@@ -15,6 +15,7 @@ RUN apk add --no-cache ${REQUIRE}
 ARG MPICH_SRC_DIR="/tmp/mpich-3.3.1"
 ARG MPICH_VERSION="3.3.1"
 ARG MPICH_CONFIGURE_OPTIONS="--prefix=/usr/local/mpi-3.3.1"
+ARG MPICH_INSTALL_PREFIX="/usr/local/mpi-3.3.1"
 ARG MPICH_MAKE_OPTIONS=""
 
 # Download, build, and install MPICH
@@ -24,7 +25,10 @@ RUN wget http://www.mpich.org/static/downloads/${MPICH_VERSION}/mpich-${MPICH_VE
     && cd mpich-${MPICH_VERSION}  \
     && ./configure ${MPICH_CONFIGURE_OPTIONS}  \
     && make ${MPICH_MAKE_OPTIONS} && make install \
+    && sed -i 's/allargs\[@\]/allargs/g' ${MPICH_INSTALL_PREFIX}/bin/mpicc \
+    && sed -i 's/allargs\[@\]/allargs/g' ${MPICH_INSTALL_PREFIX}/bin/mpicxx \
     && rm -rf ${MPICH_SRC_DIR}
+# the sed command is because that, command with `"${allargs[@]}"` not work in ash shell.
 
 
 FROM alpine:latest
