@@ -1,5 +1,5 @@
 # docker build --rm=true -t genshen/mpich:3.3.1 .
-FROM alpine:latest AS mpich_builder
+FROM alpine:3.10.3 AS mpich_builder
 
 ARG REQUIRE="build-base gfortran linux-headers"
 #  apk update && apk upgrade
@@ -31,7 +31,7 @@ RUN wget http://www.mpich.org/static/downloads/${MPICH_VERSION}/mpich-${MPICH_VE
 # the sed command is because that, command with `"${allargs[@]}"` not work in ash shell.
 
 
-FROM alpine:latest
+FROM alpine:3.10.3
 
 LABEL maintainer="genshen genshenchu@gmail.com" \
       description="MPI development environment,including mpich,gcc,g++,gfortran,make."

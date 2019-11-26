@@ -1,6 +1,6 @@
 # This is mpich Dockerfile for clang/clang++ compiler (no fortran compiler).
 # docker build --rm=true -t genshen/mpich:3.3.1-clang .
-FROM genshen/clang-toolchain:latest AS mpich_builder
+FROM genshen/clang-toolchain:9.0.0 AS mpich_builder
 
 RUN apk add --no-cache make linux-headers
 
@@ -29,7 +29,7 @@ RUN wget http://www.mpich.org/static/downloads/${MPICH_VERSION}/mpich-${MPICH_VE
     && rm -rf ${MPICH_SRC_DIR}
 
 
-FROM genshen/clang-toolchain:latest
+FROM genshen/clang-toolchain:9.0.0
 
 LABEL maintainer="genshen genshenchu@gmail.com" \
       description="MPI development environment based on clang, including clang,clang++,mpich,make."
